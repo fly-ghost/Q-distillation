@@ -17,7 +17,7 @@ from utils.data import FeedBackDataset
 from utils.preprocess import feedback_tokenize, collate_fn
 from utils.parameters import MAX_LENGTH, BATCH_SIZE
 from utils.path import BASE_DIR, STUDENT_MODEL_NAME, STUDENT_TOKENIZER_NAME, TEACHER_MODEL_NAME, FILENAME
-from utils.models import load_model, FeedBackDistillationLoss, standard_train, DistillationLoss
+from utils.models import load_model, persd_train, PERsDLoss
 from rein import Agent
 
 def setup_seed(seed):
@@ -31,7 +31,7 @@ setup_seed(42)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-filename = os.path.join(BASE_DIR, "dataset", "standard", FILENAME)
+filename = os.path.join(BASE_DIR, "dataset", "PERsD", FILENAME)
 
 # 模型蒸馏的条件是已经有训练好的模型，因此不需要分训练集和测试集
 dataset = FeedBackDataset(filename, is_inference=False)
@@ -86,8 +86,7 @@ num_warmup_steps = epochs // 10
 num_training_steps = epochs * len(dataloader)
 
 T = 1.0
-a = 0.25
-criterion = DistillationLoss(T, a)
+criterion = PERsDLoss(T)
 
 optimizer = torch.optim.AdamW(
     student_model.parameters(),
@@ -107,4 +106,4 @@ if STUDENT_MODEL_NAME in ["codet5p-small"]:
 
 agent = Agent(student_model, tokenizer, tokenizer_inference, is_decoder=is_decoder, T=T, step=1)
 
-standard_train(student_model, teacher_model, dataloader, criterion, optimizer, scheduler, agent, epochs, is_decoder, beta=100)
+persd_train(student_model, teacher_model, dataloader, criterion, optimizer, scheduler, agent, epochs, is_decoder, beta=100)
