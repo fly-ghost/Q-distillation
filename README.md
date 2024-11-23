@@ -25,15 +25,11 @@ Place the downloaded files into the models/codet5p-base folder
 
 ## Start distillation
 ```sh
-python distillation/feedback/main.py
+python feedback_distillation.py --model="codet5p-small" --tokenizer="codet5p-small" --teacher_model="codet5p-base" --teacher_tokenizer="codet5p-base" --dataset="humaneval"
 ```
-The models are saved to ```models/codet5p-temp``` for each iteration, with the best models saved to ```models/codet5p-peft```.
-Data from the model distillation process is stored in ```values/values.jsonl```.
+The models are saved to ```models/codet5p-small/temp``` for each iteration, with the best models saved to ```models/codet5p-small/feedback```.
 # Evaluation
 ```sh
-python inference.py
+python main.py --model="codet5p-small" --tokenizer="codet5p-small" --method="feedback"
 ```
-By running this command, the distilled student model is evaluated and the results are saved in ```evaluation/codet5p-peft```.
-
-# Configs
-We store the configuration file under the utils folder where ```parameters.py``` is used to set the parameters and ```path.py``` is used to set which models to use and save paths.
+By running this command, the distilled student model is evaluated and the results are saved in ```samples/codet5p-small/feedback```.
